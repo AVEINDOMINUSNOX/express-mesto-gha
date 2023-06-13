@@ -1,3 +1,4 @@
+/* eslint-disable no-console */
 const Card = require('../models/card');
 
 const getCards = (req, res) => {
