@@ -17,16 +17,14 @@ const getUsers = (req, res) => {
 
 const getUser = (req, res) => {
   User.findById(req.params.id)
-    .orFail(new Error('NotFound'))
-    .then((user) => res.send(user))
-    .catch((err) => {
-      if (err.name === 'NotFound') {
-        res.status(ERROR_CODE_DATA_NOT_FOUND).send({
-          message: `Пользователь с указанным _id не найден, произошла ошибка: ${err.message}`,
-          stack: err.stack,
-        });
+    .then((user) => {
+      if (!user) {
+        res.status(ERROR_CODE_DATA_NOT_FOUND).send({ message: 'Пользователь с указанным _id не найден, произошла ошибка' });
         return;
       }
+      res.send(user);
+    })
+    .catch((err) => {
       if (err.name === 'CastError') {
         res.status(ERROR_CODE_INCORRECT_DATA).send({
           message: `Передан не верный id пользователя, произошла ошибка: ${err.message}`,
