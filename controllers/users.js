@@ -20,7 +20,7 @@ const getUser = (req, res) => {
     .orFail(new Error('NotFound'))
     .then((user) => res.send(user))
     .catch((err) => {
-      if (err.name === 'CastError') {
+      if (err.name === 'NotFound') {
         res.status(ERROR_CODE_DATA_NOT_FOUND).send({
           message: `Пользователь с указанным _id не найден, произошла ошибка: ${err.message}`,
           stack: err.stack,

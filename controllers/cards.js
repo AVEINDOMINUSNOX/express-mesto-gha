@@ -21,11 +21,11 @@ const getCards = (req, res) => {
 const createCard = (req, res) => {
   const { name, link } = req.body;
 
-  Card.create({ name, link })
-    .orFail(new Error('NotFound'))
+  Card.create({ name, link, owner: req.user._id })
+    /* .orFail(new Error('NotFound')) */
     .then((cards) => res.send(cards))
     .catch((err) => {
-      if (err.name === 'NotFound') {
+      if (err.name === 'CastError') {
         res.status(ERROR_CODE_DATA_NOT_FOUND).send({
           message: `Переданы некорректные данные при создании карточки, произошла ошибка: ${err.message}`,
           stack: err.stack,
@@ -40,19 +40,22 @@ const createCard = (req, res) => {
 };
 
 const deleteCard = (req, res) => {
-  Card.findByIdAndRemove(req.params.cardId)
-    .orFail(new Error('NotFound'))
-    .then((card) => res.send({
-      message: `Карточка ${card} удалена`,
-    }))
-    .catch((err) => {
-      if (err.name === 'NotFound') {
-        res.status(ERROR_CODE_DATA_NOT_FOUND).send({
-          message: `Карточка с указанным _id не найдена, произошла ошибка: ${err.message}`,
-          stack: err.stack,
-        });
+  Card.findById(req.params.cardId)
+    .then((card) => {
+      if (!card) {
+        res.status(ERROR_CODE_DATA_NOT_FOUND).send('Карточка с указанным _id не найдена');
         return;
       }
+      Card.findByIdAndRemove(req.params.cardId)
+        .then(() => res.send({ message: `Карточка ${req.params.cardId} удалена` }))
+        .catch((err) => {
+          res.status(ERROR_CODE_DEFAULT).send({
+            message: `Ошибка ${err.message}`,
+            stack: err.stack,
+          });
+        });
+    })
+    .catch((err) => {
       res.status(ERROR_CODE_DEFAULT).send({
         message: `Ошибка ${err.message}`,
         stack: err.stack,
