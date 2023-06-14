@@ -9,7 +9,7 @@
     "start": "node app.js",
     "dev": "nodemon app.js"
   },
-  "author": "",
+  "author": "Shinkarenko Anton",
   "license": "ISC",
   "devDependencies": {
     "eslint": "^8.42.0",

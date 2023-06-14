@@ -11,7 +11,6 @@ const getCards = (req, res) => {
     .then((cards) => res.send(cards))
     .catch((err) => res.status(ERROR_CODE_DEFAULT).send({
       message: `Произошла ошибка: ${err.message}`,
-      stack: err.stack,
     }));
 };
 
@@ -24,7 +23,6 @@ const createCard = (req, res) => {
       if (err.name === 'ValidationError') {
         res.status(ERROR_CODE_INCORRECT_DATA).send({
           message: `Переданы некорректные данные при создании карточки, произошла ошибка: ${err.message}`,
-          stack: err.stack,
         });
         return;
       }
@@ -44,7 +42,6 @@ const deleteCard = (req, res) => {
         .catch((err) => {
           res.status(ERROR_CODE_DEFAULT).send({
             message: `Ошибка ${err.message}`,
-            stack: err.stack,
           });
         });
     })
@@ -52,7 +49,6 @@ const deleteCard = (req, res) => {
       if (err.name === 'CastError') {
         res.status(ERROR_CODE_INCORRECT_DATA).send({
           message: `Переданы некорректные данные для удаления карточки, произошла ошибка: ${err.message}`,
-          stack: err.stack,
         });
         return;
       }
@@ -73,7 +69,6 @@ const likeCard = (req, res) => {
         .catch((err) => {
           res.status(ERROR_CODE_DEFAULT).send({
             message: `Произошла ошибка ${err.message}`,
-            stack: err.stack,
           });
         });
     })
@@ -81,7 +76,6 @@ const likeCard = (req, res) => {
       if (err.name === 'CastError') {
         res.status(ERROR_CODE_INCORRECT_DATA).send({
           message: `Переданы некорректные данные для постановки/снятии лайка, произошла ошибка: ${err.message}`,
-          stack: err.stack,
         });
         return;
       }
@@ -100,7 +94,6 @@ const dislikeCard = (req, res) => {
         .catch((err) => {
           res.status(ERROR_CODE_DEFAULT).send({
             message: `Произошла ошибка ${err.message}`,
-            stack: err.stack,
           });
         });
     })
@@ -108,7 +101,6 @@ const dislikeCard = (req, res) => {
       if (err.name === 'CastError') {
         res.status(ERROR_CODE_INCORRECT_DATA).send({
           message: `Переданы некорректные данные для постановки/снятии лайка, произошла ошибка: ${err.message}`,
-          stack: err.stack,
         });
         return;
       }

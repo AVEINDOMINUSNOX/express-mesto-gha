@@ -11,7 +11,6 @@ const getUsers = (req, res) => {
     .then((users) => res.send({ users }))
     .catch((err) => res.status(ERROR_CODE_DEFAULT).send({
       message: `Ошибка: ${err.message}`,
-      stack: err.stack,
     }));
 };
 
@@ -28,7 +27,6 @@ const getUser = (req, res) => {
       if (err.name === 'CastError') {
         res.status(ERROR_CODE_INCORRECT_DATA).send({
           message: `Передан не верный id пользователя, произошла ошибка: ${err.message}`,
-          stack: err.stack,
         });
         return;
       }
@@ -48,13 +46,11 @@ const createUser = (req, res) => {
       if (err.name === 'ValidationError') {
         res.status(ERROR_CODE_INCORRECT_DATA).send({
           message: `Переданы некорректные данные при создании пользователя, произошла ошибка: ${err.message}`,
-          stack: err.stack,
         });
         return;
       }
       res.status(ERROR_CODE_DEFAULT).send({
         message: err.message,
-        stack: err.stack,
       });
     });
 };
@@ -67,14 +63,12 @@ const editUser = (req, res) => {
       if (err.name === 'NotFound') {
         res.status(ERROR_CODE_DATA_NOT_FOUND).send({
           message: `Пользователь с указанным _id не найден, произошла ошибка: ${err.message}`,
-          stack: err.stack,
         });
         return;
       }
       if (err.name === 'ValidationError') {
         res.status(ERROR_CODE_INCORRECT_DATA).send({
           message: `Переданы некорректные данные при обновлении профиля, произошла ошибка: ${err.message}`,
-          stack: err.stack,
         });
         return;
       }
