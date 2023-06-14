@@ -1,5 +1,3 @@
-/* eslint-disable indent */
-/* eslint-disable no-console */
 const Card = require('../models/card');
 
 const {
@@ -11,32 +9,26 @@ const {
 const getCards = (req, res) => {
   Card.find({})
     .then((cards) => res.send(cards))
-    .catch((err) =>
-      // eslint-disable-next-line implicit-arrow-linebreak
-      res.status(ERROR_CODE_DEFAULT).send({
-        message: `Произошла ошибка: ${err.message}`,
-        stack: err.stack,
-      }));
+    .catch((err) => res.status(ERROR_CODE_DEFAULT).send({
+      message: `Произошла ошибка: ${err.message}`,
+      stack: err.stack,
+    }));
 };
 
 const createCard = (req, res) => {
   const { name, link } = req.body;
 
   Card.create({ name, link, owner: req.user._id })
-    /* .orFail(new Error('NotFound')) */
     .then((cards) => res.send(cards))
     .catch((err) => {
       if (err.name === 'ValidationError') {
-        res.status(ERROR_CODE_DATA_NOT_FOUND).send({
+        res.status(ERROR_CODE_INCORRECT_DATA).send({
           message: `Переданы некорректные данные при создании карточки, произошла ошибка: ${err.message}`,
           stack: err.stack,
         });
         return;
       }
-      res.status(ERROR_CODE_DEFAULT).send({
-        message: `Ошибка: ${err.message}`,
-        stack: err.stack,
-      });
+      res.status(ERROR_CODE_DEFAULT).send({ message: `Произошла ошибка: ${err.message}` });
     });
 };
 
@@ -44,7 +36,7 @@ const deleteCard = (req, res) => {
   Card.findById(req.params.cardId)
     .then((card) => {
       if (!card) {
-        res.status(ERROR_CODE_DATA_NOT_FOUND).send('Карточка с указанным _id не найдена');
+        res.status(ERROR_CODE_DATA_NOT_FOUND).send({ message: 'Карточка с указанным _id не найдена' });
         return;
       }
       Card.findByIdAndRemove(req.params.cardId)
@@ -57,10 +49,14 @@ const deleteCard = (req, res) => {
         });
     })
     .catch((err) => {
-      res.status(ERROR_CODE_DEFAULT).send({
-        message: `Ошибка ${err.message}`,
-        stack: err.stack,
-      });
+      if (err.name === 'CastError') {
+        res.status(ERROR_CODE_INCORRECT_DATA).send({
+          message: `Переданы некорректные данные для удаления карточки, произошла ошибка: ${err.message}`,
+          stack: err.stack,
+        });
+        return;
+      }
+      res.status(ERROR_CODE_DEFAULT).send({ message: `Ошибка ${err.message}` });
     });
 };
 
@@ -68,36 +64,19 @@ const likeCard = (req, res) => {
   Card.findById(req.params.cardId)
     .then((card) => {
       if (!card) {
-        res.status(ERROR_CODE_DATA_NOT_FOUND).send('Карточка с указанным _id не найдена');
+        res.status(ERROR_CODE_DATA_NOT_FOUND).send({ message: 'Карточка с указанным _id не найдена' });
         return;
       }
-  Card.findByIdAndUpdate(req.params.cardId, { $addToSet: { likes: req.user._id } }, { new: true })
+      // eslint-disable-next-line max-len
+      Card.findByIdAndUpdate(req.params.cardId, { $addToSet: { likes: req.user._id } }, { new: true })
         .then((newCard) => res.send(newCard))
         .catch((err) => {
-          if (err.name === 'CastError') {
-            res.status(ERROR_CODE_INCORRECT_DATA).send({
-              message: `Переданы некорректные данные для постановки/снятии лайка, произошла ошибка: ${err.message}`,
-              stack: err.stack,
-            });
-            return;
-          }
-          res.send({ message: `Произошла ошибка ${err.message}` });
+          res.status(ERROR_CODE_DEFAULT).send({
+            message: `Произошла ошибка ${err.message}`,
+            stack: err.stack,
+          });
         });
     })
-    .catch((err) => {
-      res.status(ERROR_CODE_DEFAULT).send({ message: `Ошибка ${err.message}` });
-    });
-};
-
-const dislikeCard = (req, res) => {
-  Card.findById(req.params.cardId)
-  .then((card) => {
-    if (!card) {
-      res.status(ERROR_CODE_DATA_NOT_FOUND).send('Карточка с указанным _id не найдена');
-      return;
-    }
-    Card.findByIdAndUpdate(req.params.cardId, { $pull: { likes: req.user._id } }, { new: true })
-    .then((newCard) => res.send(newCard))
     .catch((err) => {
       if (err.name === 'CastError') {
         res.status(ERROR_CODE_INCORRECT_DATA).send({
@@ -106,12 +85,35 @@ const dislikeCard = (req, res) => {
         });
         return;
       }
-      res.send({ message: `Произошла ошибка ${err.message}` });
+      res.status(ERROR_CODE_DEFAULT).send({ message: `Ошибка ${err.message}` });
     });
-})
-.catch((err) => {
-  res.status(ERROR_CODE_DEFAULT).send({ message: `Ошибка ${err.message}` });
-});
+};
+const dislikeCard = (req, res) => {
+  Card.findById(req.params.cardId)
+    .then((card) => {
+      if (!card) {
+        res.status(ERROR_CODE_DATA_NOT_FOUND).send({ message: 'Карточка с указанным _id не найдена' });
+        return;
+      }
+      Card.findByIdAndUpdate(req.params.cardId, { $pull: { likes: req.user._id } }, { new: true })
+        .then((newCard) => res.send(newCard))
+        .catch((err) => {
+          res.status(ERROR_CODE_DEFAULT).send({
+            message: `Произошла ошибка ${err.message}`,
+            stack: err.stack,
+          });
+        });
+    })
+    .catch((err) => {
+      if (err.name === 'CastError') {
+        res.status(ERROR_CODE_INCORRECT_DATA).send({
+          message: `Переданы некорректные данные для постановки/снятии лайка, произошла ошибка: ${err.message}`,
+          stack: err.stack,
+        });
+        return;
+      }
+      res.status(ERROR_CODE_DEFAULT).send({ message: `Ошибка ${err.message}` });
+    });
 };
 
 module.exports = {
