@@ -4,6 +4,8 @@ const mongoose = require('mongoose');
 const bodyParser = require('body-parser');
 const helmet = require('helmet');
 const rateLimit = require('express-rate-limit');
+//перенести потом в index.js
+const { login, createUser } = require('./controllers/users');
 
 const { ERROR_CODE_DATA_NOT_FOUND } = require('./utils/utils');
 
@@ -30,6 +32,8 @@ const limiter = rateLimit({
 //перенести потом в index.js
 app.use(limiter);
 app.use(helmet());
+app.post('/signup', createUser);
+app.post('/signin', login);
 
 app.use(require('./routes/index'));
 
