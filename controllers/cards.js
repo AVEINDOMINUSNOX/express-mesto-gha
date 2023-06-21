@@ -57,7 +57,7 @@ const deleteCard = (req, res) => {
 };
 
 const likeCard = (req, res) => {
-  Card.findById(req.params.cardId, { $addToSet: { likes: req.user._id } }, { new: true })
+  Card.findByIdAndUpdate(req.params.cardId, { $addToSet: { likes: req.user._id } }, { new: true })
     .then((newCard) => {
       if (!newCard) {
         res.status(ERROR_CODE_DATA_NOT_FOUND).send({
@@ -82,7 +82,7 @@ const likeCard = (req, res) => {
 };
 
 const dislikeCard = (req, res) => {
-  Card.findById(req.params.cardId, { $pull: { likes: req.user._id } }, { new: true })
+  Card.findByIdAndUpdate(req.params.cardId, { $pull: { likes: req.user._id } }, { new: true })
     .then((newCard) => {
       if (!newCard) {
         res.status(ERROR_CODE_DATA_NOT_FOUND).send({
