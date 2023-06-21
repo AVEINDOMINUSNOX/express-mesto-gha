@@ -1,6 +1,9 @@
+/* eslint-disable spaced-comment */
 const express = require('express');
 const mongoose = require('mongoose');
 const bodyParser = require('body-parser');
+const helmet = require('helmet');
+const rateLimit = require('express-rate-limit');
 
 const { ERROR_CODE_DATA_NOT_FOUND } = require('./utils/utils');
 
@@ -17,6 +20,16 @@ app.use((req, res, next) => {
 
   next();
 });
+
+const limiter = rateLimit({
+  windowMs: 15 * 60 * 1000,
+  max: 100,
+  standardHeaders: true,
+  legacyHeaders: false,
+});
+//перенести потом в index.js
+app.use(limiter);
+app.use(helmet());
 
 app.use(require('./routes/index'));
 
