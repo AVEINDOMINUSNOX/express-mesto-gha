@@ -9,8 +9,8 @@ const {
 const getCards = (req, res) => {
   Card.find({})
     .then((cards) => res.send(cards))
-    .catch((err) => res.status(ERROR_CODE_DEFAULT).send({
-      message: `Произошла ошибка: ${err.message}`,
+    .catch(() => res.status(ERROR_CODE_DEFAULT).send({
+      message: 'Произошла ошибка',
     }));
 };
 
@@ -22,11 +22,11 @@ const createCard = (req, res) => {
     .catch((err) => {
       if (err.name === 'ValidationError') {
         res.status(ERROR_CODE_INCORRECT_DATA).send({
-          message: `Переданы некорректные данные при создании карточки, произошла ошибка: ${err.message}`,
+          message: 'Переданы некорректные данные при создании карточки, произошла ошибка',
         });
         return;
       }
-      res.status(ERROR_CODE_DEFAULT).send({ message: `Произошла ошибка: ${err.message}` });
+      res.status(ERROR_CODE_DEFAULT).send({ message: 'Произошла ошибка' });
     });
 };
 
@@ -39,20 +39,20 @@ const deleteCard = (req, res) => {
       }
       Card.findByIdAndRemove(req.params.cardId)
         .then(() => res.send({ message: `Карточка ${req.params.cardId} удалена` }))
-        .catch((err) => {
+        .catch(() => {
           res.status(ERROR_CODE_DEFAULT).send({
-            message: `Ошибка ${err.message}`,
+            message: 'Ошибка',
           });
         });
     })
     .catch((err) => {
       if (err.name === 'CastError') {
         res.status(ERROR_CODE_INCORRECT_DATA).send({
-          message: `Переданы некорректные данные для удаления карточки, произошла ошибка: ${err.message}`,
+          message: 'Переданы некорректные данные для удаления карточки, произошла ошибка',
         });
         return;
       }
-      res.status(ERROR_CODE_DEFAULT).send({ message: `Ошибка ${err.message}` });
+      res.status(ERROR_CODE_DEFAULT).send({ message: 'Ошибка' });
     });
 };
 
@@ -66,20 +66,20 @@ const likeCard = (req, res) => {
       // eslint-disable-next-line max-len
       Card.findByIdAndUpdate(req.params.cardId, { $addToSet: { likes: req.user._id } }, { new: true })
         .then((newCard) => res.send(newCard))
-        .catch((err) => {
+        .catch(() => {
           res.status(ERROR_CODE_DEFAULT).send({
-            message: `Произошла ошибка ${err.message}`,
+            message: 'Ошибка',
           });
         });
     })
     .catch((err) => {
       if (err.name === 'CastError') {
         res.status(ERROR_CODE_INCORRECT_DATA).send({
-          message: `Переданы некорректные данные для постановки/снятии лайка, произошла ошибка: ${err.message}`,
+          message: 'Переданы некорректные данные для постановки/снятии лайка, произошла ошибка',
         });
         return;
       }
-      res.status(ERROR_CODE_DEFAULT).send({ message: `Ошибка ${err.message}` });
+      res.status(ERROR_CODE_DEFAULT).send({ message: 'Ошибка' });
     });
 };
 const dislikeCard = (req, res) => {
@@ -91,20 +91,20 @@ const dislikeCard = (req, res) => {
       }
       Card.findByIdAndUpdate(req.params.cardId, { $pull: { likes: req.user._id } }, { new: true })
         .then((newCard) => res.send(newCard))
-        .catch((err) => {
+        .catch(() => {
           res.status(ERROR_CODE_DEFAULT).send({
-            message: `Произошла ошибка ${err.message}`,
+            message: 'Произошла ошибка',
           });
         });
     })
     .catch((err) => {
       if (err.name === 'CastError') {
         res.status(ERROR_CODE_INCORRECT_DATA).send({
-          message: `Переданы некорректные данные для постановки/снятии лайка, произошла ошибка: ${err.message}`,
+          message: 'Переданы некорректные данные для постановки/снятии лайка, произошла ошибка',
         });
         return;
       }
-      res.status(ERROR_CODE_DEFAULT).send({ message: `Ошибка ${err.message}` });
+      res.status(ERROR_CODE_DEFAULT).send({ message: 'Ошибка' });
     });
 };
 
