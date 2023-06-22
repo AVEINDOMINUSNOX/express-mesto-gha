@@ -9,21 +9,18 @@ const IncorrectTokenError = require('../errors/incorrectTokenError');
 const userSchema = new mongoose.Schema({
   name: {
     type: String,
-    minlength: 2,
-    maxlength: 30,
-    required: true,
+    minlength: [2, 'длина имени должна быть не менее 2 символов'],
+    maxlength: [30, 'длина имени должна быть не более 30 символов'],
     default: 'Жак-Ив Кусто',
   },
   about: {
     type: String,
-    minlength: 2,
-    maxlength: 30,
-    required: true,
+    minlength: [2, 'длина строки должна быть не менее 2 символов'],
+    maxlength: [30, 'длина строки должна быть не более 30 символов'],
     default: 'Исследователь',
   },
   avatar: {
     type: String,
-    required: true,
     default: 'https://pictures.s3.yandex.net/resources/jacques-cousteau_1604399756.png',
     validate: {
       validator: (value) => validator.isURL(
@@ -38,35 +35,38 @@ const userSchema = new mongoose.Schema({
     },
   },
   email: {
-    unique: true,
     type: String,
     required: true,
+    unique: true,
     validate: {
       validator: validator.isEmail,
-      message: 'Введите корректный емэил',
+      message: 'Некоррекный email',
     },
   },
   password: {
     type: String,
-    select: false,
     required: true,
+    select: false,
   },
 });
 
+// eslint-disable-next-line func-names
 userSchema.statics.findUserByCredentials = function (email, password) {
-  return this.findOne({ email })
+  return this.findOne({ email }).select('+password')
     .then((user) => {
       if (!user) {
-        return Promise.reject(new IncorrectTokenError('Указан неправильный адрес почты или пароль'));
+        return Promise.reject(new IncorrectTokenError('Данный пользователь не зарегистрирован'));
       }
 
       return bcrypt.compare(password, user.password)
         .then((matched) => {
           if (!matched) {
-            return Promise.reject(new IncorrectDataError('Указан неправильный адрес почты или пароль'));
+            return Promise.reject(new IncorrectDataError('Неправильные почта или пароль'));
           }
+
           return user;
         });
     });
 };
+
 module.exports = mongoose.model('user', userSchema);
