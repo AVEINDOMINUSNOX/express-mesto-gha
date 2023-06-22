@@ -7,12 +7,6 @@ const EmailNotUniqueError = require('../errors/emailNotUniqeError');
 
 const User = require('../models/user');
 
-/* const {
-  ERROR_CODE_INCORRECT_DATA,
-  ERROR_CODE_DATA_NOT_FOUND,
-  ERROR_CODE_DEFAULT,
-} = require('../utils/utils'); */
-
 const getUsers = (req, res, next) => {
   User.find({})
     .then((users) => res.send(users))
@@ -44,17 +38,6 @@ const getMeUser = (req, res, next) => {
     .catch((err) => next(err));
 };
 
-const login = (req, res, next) => {
-  const { email, password } = req.body;
-
-  return User.findUserByCredentials(email, password)
-    .then((user) => {
-      const token = jwt.sign({ _id: user._id }, 'Ave-Dominus-Nox', { expiresIn: '7d' });
-      res.send({ token });
-    })
-    .catch((err) => next(err));
-};
-
 const createUser = (req, res, next) => {
   const {
     name, about, avatar, email,
@@ -81,9 +64,25 @@ const createUser = (req, res, next) => {
     .catch(next);
 };
 
+const login = (req, res, next) => {
+  const { email, password } = req.body;
+
+  return User.findUserByCredentials(email, password)
+    .then((user) => {
+      const token = jwt.sign({ _id: user._id }, 'Ave-Dominus-Nox', { expiresIn: '7d' });
+      res.send({ token });
+    })
+    .catch((err) => next(err));
+};
+
 const editUser = (req, res, next) => {
   const { name, about } = req.body;
-  User.findByIdAndUpdate(req.user._id, { name, about }, { new: true, runValidators: true })
+
+  User.findByIdAndUpdate(
+    req.user._id,
+    { name, about },
+    { new: true, runValidators: true },
+  )
     .orFail(() => new NotFoundError('Пользователь с указанным _id не найден, произошла ошибка'))
     .then((user) => res.send(user))
     .catch((err) => {
@@ -100,7 +99,11 @@ const editUser = (req, res, next) => {
 const editAvatar = (req, res, next) => {
   const { avatar } = req.body;
 
-  User.findByIdAndUpdate(req.user._id, { avatar }, { new: true, runValidators: true })
+  User.findByIdAndUpdate(
+    req.user._id,
+    { avatar },
+    { new: true, runValidators: true },
+  )
     .orFail(() => new NotFoundError('Пользователь с указанным _id не найден, произошла ошибка'))
     .then((userAvatar) => res.send(userAvatar))
     .catch((err) => {
@@ -113,7 +116,6 @@ const editAvatar = (req, res, next) => {
       }
     });
 };
-
 module.exports = {
   getUsers,
   getUser,

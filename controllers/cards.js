@@ -4,12 +4,6 @@ const IncorrectDataError = require('../errors/incorrectDataError');
 const NotFoundError = require('../errors/notFoundError');
 const ForbiddenError = require('../errors/forbiddenError');
 
-/* const {
-  ERROR_CODE_INCORRECT_DATA,
-  ERROR_CODE_DATA_NOT_FOUND,
-  ERROR_CODE_DEFAULT,
-} = require('../utils/utils'); */
-
 const getCards = (req, res, next) => {
   Card.find({})
     .then((cards) => res.send(cards))
@@ -23,7 +17,7 @@ const createCard = (req, res, next) => {
     .then((cards) => res.send(cards))
     .catch((err) => {
       if (err.name === 'ValidationError') {
-        next(new IncorrectDataError('Переданы некорректные данные при создании карточки, ошибка валидации'));
+        next(new IncorrectDataError('Переданы некорректные данные при создании карточки, произошла ошибка валидации'));
       } else {
         next(err);
       }
