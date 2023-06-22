@@ -3,7 +3,6 @@ const mongoose = require('mongoose');
 const bcrypt = require('bcrypt');
 const validator = require('validator');
 
-const IncorrectDataError = require('../errors/incorrectDataError');
 const IncorrectTokenError = require('../errors/incorrectTokenError');
 
 const userSchema = new mongoose.Schema({
@@ -11,19 +10,16 @@ const userSchema = new mongoose.Schema({
     type: String,
     minlength: [2, 'длина имени должна быть не менее 2 символов'],
     maxlength: [30, 'длина имени должна быть не более 30 символов'],
-    required: true,
     default: 'Жак-Ив Кусто',
   },
   about: {
     type: String,
     minlength: [2, 'длина имени должна быть не менее 2 символов'],
     maxlength: [30, 'длина имени должна быть не более 30 символов'],
-    required: true,
     default: 'Исследователь',
   },
   avatar: {
     type: String,
-    required: true,
     default: 'https://pictures.s3.yandex.net/resources/jacques-cousteau_1604399756.png',
     validate: {
       validator: (value) => validator.isURL(
@@ -63,7 +59,7 @@ userSchema.statics.findUserByCredentials = function (email, password) {
       return bcrypt.compare(password, user.password)
         .then((matched) => {
           if (!matched) {
-            return Promise.reject(new IncorrectDataError('Указан неправильный адрес почты или пароль'));
+            return Promise.reject(new IncorrectTokenError('Указан неправильный адрес почты или пароль'));
           }
           return user;
         });

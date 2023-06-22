@@ -21,14 +21,14 @@ const validationLoginUser = celebrate({
 
 const validationUserEdit = celebrate({
   body: Joi.object().keys({
-    name: Joi.string().min(2).max(30),
-    about: Joi.string().min(2).max(30),
+    name: Joi.string().required().min(2).max(30),
+    about: Joi.string().required().min(2).max(30),
   }),
 });
 
 const validationEditAvatar = celebrate({
   body: Joi.object().keys({
-    avatar: Joi.string().pattern(urlRegex),
+    avatar: Joi.string().required().pattern(urlRegex),
   }),
 });
 const validationUserId = celebrate({

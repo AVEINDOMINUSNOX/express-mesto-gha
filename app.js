@@ -1,7 +1,6 @@
 /* eslint-disable no-console */
 const express = require('express');
 const mongoose = require('mongoose');
-const bodyParser = require('body-parser');
 const rateLimit = require('express-rate-limit');
 const helmet = require('helmet');
 
@@ -19,7 +18,7 @@ const app = express();
 
 mongoose.connect('mongodb://127.0.0.1:27017/mestodb');
 
-app.use(bodyParser.json());
+app.use(express.json());
 
 const limiter = rateLimit({
   windowMs: 15 * 60 * 1000,
@@ -35,9 +34,7 @@ app.post('/signin', validationLoginUser, login);
 app.post('/signup', validationCreateUser, createUser);
 app.use(userRouter);
 app.use(cardRouter);
-app.use('*', () => {
-  throw new NotFoundError('Запрашиваемая страница не найдена');
-});
+app.use((req, res, next) => next(new NotFoundError('Запрашиваемая страница не найдена')));
 
 app.use(errors());
 app.use(handlerError);
