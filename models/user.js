@@ -9,15 +9,15 @@ const IncorrectTokenError = require('../errors/incorrectTokenError');
 const userSchema = new mongoose.Schema({
   name: {
     type: String,
-    minlength: 2,
-    maxlength: 30,
+    minlength: [2, 'длина имени должна быть не менее 2 символов'],
+    maxlength: [30, 'длина имени должна быть не более 30 символов'],
     required: true,
     default: 'Жак-Ив Кусто',
   },
   about: {
     type: String,
-    minlength: 2,
-    maxlength: 30,
+    minlength: [2, 'длина имени должна быть не менее 2 символов'],
+    maxlength: [30, 'длина имени должна быть не более 30 символов'],
     required: true,
     default: 'Исследователь',
   },
